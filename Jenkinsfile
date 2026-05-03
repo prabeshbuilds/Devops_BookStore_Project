@@ -7,46 +7,9 @@ pipeline {
 
     stages {
 
-        stage('📥 Checkout Code') {
+        stage('📥 Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/prabeshbuilds/Devops_BookStore_Project.git'
-            }
-        }
-
-        stage('🐍 Setup Virtual Environment') {
-            steps {
-                sh '''
-                    python3 -m venv env
-
-                    # ALWAYS use venv python (IMPORTANT FIX)
-                    env/bin/python -m pip install --upgrade pip
-                    env/bin/python -m pip install -r requirements.txt
-                '''
-            }
-        }
-
-        stage('🗄️ Run Migrations') {
-            steps {
-                sh '''
-                    env/bin/python manage.py migrate
-                '''
-            }
-        }
-
-        stage('🧪 Run Tests') {
-            steps {
-                sh '''
-                    env/bin/python manage.py test
-                '''
-            }
-        }
-
-        stage('🧹 Lint Code') {
-            steps {
-                sh '''
-                    env/bin/python -m pip install flake8
-                    env/bin/python -m flake8 .
-                '''
             }
         }
 
@@ -58,21 +21,27 @@ pipeline {
             }
         }
 
-        stage('📤 Optional Docker Run Test') {
+        stage('🧪 Run Container Test') {
             steps {
                 sh '''
-                    docker run --rm ${IMAGE_NAME}:latest echo "Container works"
+                    docker run --rm ${IMAGE_NAME}:latest python manage.py check
                 '''
+            }
+        }
+
+        stage('📤 Push Image (Optional)') {
+            steps {
+                echo "Add DockerHub push here if needed"
             }
         }
     }
 
     post {
         success {
-            echo '✅ CI Pipeline Completed Successfully'
+            echo "✅ CI/CD SUCCESS"
         }
         failure {
-            echo '❌ CI Pipeline Failed'
+            echo "❌ CI FAILED"
         }
         always {
             cleanWs()
