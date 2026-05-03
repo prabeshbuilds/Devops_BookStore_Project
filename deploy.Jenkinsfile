@@ -36,13 +36,13 @@ pipeline {
             }
         }
 
-        stage('📤 Push Image') {
-            steps {
-                sh '''
-                    docker push $IMAGE_NAME:latest
-                '''
-            }
-        }
+        // stage('📤 Push Image') {
+        //     steps {
+        //         sh '''
+        //             docker push $IMAGE_NAME:latest
+        //         '''
+        //     }
+        // }
 
         stage('🚀 Deploy on Server') {
             steps {
