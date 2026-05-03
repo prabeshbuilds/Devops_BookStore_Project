@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "prabeshbuilds/bookstore-django"
+        DB_NAME = "bookstore"
+        DB_USER = "postgres"
+        DB_PASSWORD = "postgres"
+        DB_HOST = "localhost"
+        DB_PORT = "5432"
+    }
+
+    stages {
+
+        stage('📥 Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/prabeshbuilds/todo.git'
+            }
+        }
+
+        stage('🐍 Setup Environment') {
+            steps {
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    pip install flake8
+                '''
+            }
+        }
+
+        stage('🗄️ Run Migrations') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    python manage.py migrate
+                '''
+            }
+        }
+
+        stage('🧹 Lint Code') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    flake8 .
+                '''
+            }
+        }
+
+        stage('🧪 Run Tests') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    python manage.py test
+                '''
+            }
+        }
+
+        stage('🐳 Build Docker Image') {
+            steps {
+                sh '''
+                    docker build -t ${IMAGE_NAME}:latest .
+                '''
+            }
+        }
+
+        // OPTIONAL: Uncomment if you want Docker Hub push
+        /*
+        stage('📤 Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${IMAGE_NAME}:latest
+                    '''
+                }
+            }
+        }
+        */
+
+    }
+
+    post {
+        success {
+            echo '✅ CI Pipeline Completed Successfully'
+        }
+        failure {
+            echo '❌ CI Pipeline Failed'
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
