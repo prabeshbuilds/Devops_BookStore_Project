@@ -22,31 +22,38 @@ pipeline {
             }
         }
 
-        stage('🔐 Docker Login') {
+        stage('🔨 Build Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-credentials',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
                 )]) {
                     sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    set -e
+                    echo "🔨 Building Docker image..."
+                    docker build --pull -t $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG .
+                    docker tag $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG $DOCKER_USERNAME/$APP_NAME:latest
                     '''
                 }
             }
         }
 
-        stage('📤 Push Image') {
+        stage('📤 Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-credentials',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
                 )]) {
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    set -e
+                    echo "📤 Logging in to DockerHub..."
+                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-                        docker push $IMAGE_NAME:latest
+                    echo "📤 Pushing Docker images..."
+                    docker push $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG
+                    docker push $DOCKER_USERNAME/$APP_NAME:latest
                     '''
                 }
             }
