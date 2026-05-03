@@ -38,6 +38,11 @@ pipeline {
 
         stage('📤 Push Image') {
             steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                 sh '''
                 docker tag $IMAGE_NAME:latest $IMAGE_NAME:latest
                 docker push $IMAGE_NAME:latest
