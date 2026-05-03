@@ -21,14 +21,15 @@ pipeline {
             }
         }
 
-        stage('🧪 Run Container Test') {
+       stage('🧪 Run Container Test') {
             steps {
-                sh '''
-                    docker run --rm ${IMAGE_NAME}:latest python manage.py check
-                '''
+            sh '''
+            docker run --rm -w /app \
+            prabeshbuilds/bookstore-django:latest \
+            python manage.py check
+          '''
             }
         }
-
         stage('📤 Push Image (Optional)') {
             steps {
                 echo "Add DockerHub push here if needed"
