@@ -1,0 +1,17 @@
+# ignore system files
+../
+.env
+__pycache__/
+*.log
+
+# node/django/python
+node_modules/
+venv/
+env/
+myenv/
+
+# OS files
+.DS_Store
+.bash_history
+.ssh/
+.cache/
