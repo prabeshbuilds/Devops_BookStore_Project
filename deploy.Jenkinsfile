@@ -14,10 +14,32 @@ pipeline {
 
     stages {
 
-        stage('📥 Pull Latest Image') {
+        stage('🔨 Build Docker Image') {
             steps {
                 sh '''
-                    docker pull $IMAGE_NAME:latest
+                    docker build -t $IMAGE_NAME:latest .
+                '''
+            }
+        }
+
+        stage('🔐 Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('📤 Push Image') {
+            steps {
+                sh '''
+                    docker push $IMAGE_NAME:latest
                 '''
             }
         }
@@ -31,14 +53,11 @@ pipeline {
 
                             echo '🚀 Deploying Bookstore App...'
 
-                            # Pull latest image
                             docker pull $IMAGE_NAME:latest
 
-                            # Stop old container if exists
                             docker stop $APP_NAME || true
                             docker rm $APP_NAME || true
 
-                            # Run new container
                             docker run -d \
                                 --name $APP_NAME \
                                 --restart unless-stopped \
@@ -48,10 +67,7 @@ pipeline {
 
                             sleep 5
 
-                            echo '📦 Running Containers:'
                             docker ps | grep $APP_NAME || true
-
-                            echo '📜 Last Logs:'
                             docker logs --tail 20 $APP_NAME || true
                         "
                     '''
@@ -69,7 +85,6 @@ pipeline {
                             echo "✅ App is running successfully"
                             exit 0
                         fi
-                        echo "Waiting for app..."
                         sleep 5
                     done
 
