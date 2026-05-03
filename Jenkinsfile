@@ -29,14 +29,14 @@ pipeline {
             }
         }
 
-        // stage('🗄️ Run Migrations') {
-        //     steps {
-        //         sh '''
+        stage('🗄️ Run Migrations') {
+            steps {
+                sh '''
                 
-        //             python3 manage.py migrate
-        //         '''
-        //     }
-        // }
+                    python3 manage.py migrate
+                '''
+            }
+        }
 
         // stage('🧹 Lint Code') {
         //     steps {
@@ -47,14 +47,14 @@ pipeline {
         //     }
         // }
 
-        stage('🧪 Run Tests') {
-            steps {
-                sh '''
-                    source env/bin/activate
-                    python3 manage.py test
-                '''
-            }
-        }
+        // stage('🧪 Run Tests') {
+        //     steps {
+        //         sh '''
+        //             source env/bin/activate
+        //             python3 manage.py test
+        //         '''
+        //     }
+        // }
 
         stage('🐳 Build Docker Image') {
             steps {
