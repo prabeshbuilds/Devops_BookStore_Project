@@ -21,8 +21,7 @@ pipeline {
         stage('🐍 Setup Environment') {
             steps {
                 sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
+                    python3 -m venv env
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install flake8
@@ -33,7 +32,7 @@ pipeline {
         stage('🗄️ Run Migrations') {
             steps {
                 sh '''
-                    . venv/bin/activate
+                    source env/bin/activate
                     python manage.py migrate
                 '''
             }
