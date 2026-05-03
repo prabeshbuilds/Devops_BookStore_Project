@@ -3,58 +3,52 @@ pipeline {
 
     environment {
         IMAGE_NAME = "prabeshbuilds/bookstore-django"
-        DB_NAME = "bookstore"
-        DB_USER = "postgres"
-        DB_PASSWORD = "postgres"
-        DB_HOST = "localhost"
-        DB_PORT = "5432"
     }
 
     stages {
 
         stage('📥 Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/prabeshbuilds/todo.git'
+                git branch: 'main', url: 'https://github.com/prabeshbuilds/Devops_BookStore_Project.git'
             }
         }
 
-        stage('🐍 Setup Environment') {
-             steps {
-            sh '''
-                python3 -m venv env
-                env/bin/python -m pip install --upgrade pip
-                env/bin/python -m pip install -r requirements.txt
-                env/bin/python -m pip install flake8
-            '''
+        stage('🐍 Setup Virtual Environment') {
+            steps {
+                sh '''
+                    python3 -m venv env
+
+                    # ALWAYS use venv python (IMPORTANT FIX)
+                    env/bin/python -m pip install --upgrade pip
+                    env/bin/python -m pip install -r requirements.txt
+                '''
             }
         }
 
         stage('🗄️ Run Migrations') {
             steps {
                 sh '''
-                
-                    python3 manage.py migrate
+                    env/bin/python manage.py migrate
                 '''
             }
         }
 
-        // stage('🧹 Lint Code') {
-        //     steps {
-        //         sh '''
-        //             python3 -m venv env
-        //             flake8 .
-        //         '''
-        //     }
-        // }
+        stage('🧪 Run Tests') {
+            steps {
+                sh '''
+                    env/bin/python manage.py test
+                '''
+            }
+        }
 
-        // stage('🧪 Run Tests') {
-        //     steps {
-        //         sh '''
-        //             source env/bin/activate
-        //             python3 manage.py test
-        //         '''
-        //     }
-        // }
+        stage('🧹 Lint Code') {
+            steps {
+                sh '''
+                    env/bin/python -m pip install flake8
+                    env/bin/python -m flake8 .
+                '''
+            }
+        }
 
         stage('🐳 Build Docker Image') {
             steps {
@@ -64,24 +58,13 @@ pipeline {
             }
         }
 
-        // OPTIONAL: Uncomment if you want Docker Hub push
-        /*
-        stage('📤 Push Docker Image') {
+        stage('📤 Optional Docker Run Test') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push ${IMAGE_NAME}:latest
-                    '''
-                }
+                sh '''
+                    docker run --rm ${IMAGE_NAME}:latest echo "Container works"
+                '''
             }
         }
-        */
-
     }
 
     post {
