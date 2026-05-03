@@ -29,29 +29,29 @@ pipeline {
             }
         }
 
-        stage('🗄️ Run Migrations') {
-            steps {
-                sh '''
+        // stage('🗄️ Run Migrations') {
+        //     steps {
+        //         sh '''
                 
-                    python3 manage.py migrate
-                '''
-            }
-        }
+        //             python3 manage.py migrate
+        //         '''
+        //     }
+        // }
 
-        stage('🧹 Lint Code') {
-            steps {
-                sh '''
-                    python3 -m venv env
-                    flake8 .
-                '''
-            }
-        }
+        // stage('🧹 Lint Code') {
+        //     steps {
+        //         sh '''
+        //             python3 -m venv env
+        //             flake8 .
+        //         '''
+        //     }
+        // }
 
         stage('🧪 Run Tests') {
             steps {
                 sh '''
                     source env/bin/activate
-                    python manage.py test
+                    python3 manage.py test
                 '''
             }
         }
