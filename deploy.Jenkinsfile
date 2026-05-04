@@ -91,12 +91,11 @@ pipeline {
                 sh '''
                     echo "Checking application..."
 
-                    for i in $(seq 1 10); do
-                        if curl -s --max-time 5 http://$DEPLOY_SERVER:$APP_PORT | grep -i "django"; then
-                            echo "✅ App is running successfully"
-                            exit 0
-                        fi
+                    for i in {1..10}; do
+                        curl -f http://$DEPLOY_SERVER:$APP_PORT && echo "✅ App is up" && exit 0
+                        echo "Retrying..."
                         sleep 5
+                    
                     done
 
                     echo "❌ Health check failed"
