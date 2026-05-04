@@ -47,7 +47,7 @@ pipeline {
 
         stage('🚀 Deploy on Server') {
             steps {
-                sshagent(['deployment-server-ssh']) {
+                sshagent(['deployment-ssh']) {
                     sh '''
                         set -e
 
