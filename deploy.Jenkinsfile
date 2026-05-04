@@ -55,7 +55,7 @@ pipeline {
                             set -e
 
                             echo '🚀 Deploying Bookstore App...'
-
+                            echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin
                             docker pull prabeshbuilds/$APP_NAME:$IMAGE_TAG
 
                             docker stop $APP_NAME || true
