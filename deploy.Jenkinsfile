@@ -38,8 +38,6 @@ pipeline {
 
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-                        echo "📤 Pushing image..."
-                        docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG
 
                         docker push $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG
                     '''
