@@ -1,14 +1,14 @@
-# virtual environment
-env/
-venv/
-myenv/
+# # virtual environment
+# # env/
+# # venv/
+# # myenv/
 
-# Python cache
-__pycache__/
-*.pyc
+# # Python cache
+# __pycache__/
+# *.pyc
 
-# logs
-*.log
+# # logs
+# *.log
 
-# OS files
-.DS_Store
+# # OS files
+# .DS_Store

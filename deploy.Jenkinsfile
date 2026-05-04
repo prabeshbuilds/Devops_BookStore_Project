@@ -88,22 +88,27 @@ pipeline {
 
         stage('🔍 Health Check') {
             steps {
-                sh '''
-                    echo "Checking application..."
+            sh '''
+            echo "Checking application..."
 
-                    for i in {1..10}; do
-                        curl -f http://$DEPLOY_SERVER:$APP_PORT && echo "✅ App is up" && exit 0
-                        echo "Retrying..."
-                        sleep 5
-                    
-                    done
+                for i in $(seq 1 10); do
+                    STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$DEPLOY_SERVER:8034 || echo "000")
 
-                    echo "❌ Health check failed"
-                    exit 1
-                '''
+                    echo "Attempt $i → HTTP $STATUS"
+
+                    if [ "$STATUS" = "200" ]; then
+                        echo "✅ App is running successfully"
+                        exit 0
+                    fi
+
+                    sleep 5
+                done
+
+                echo "❌ Health check failed"
+                exit 1
+            '''
             }
         }
-    }
 
     post {
         success {
