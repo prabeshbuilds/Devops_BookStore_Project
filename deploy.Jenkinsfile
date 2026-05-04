@@ -91,7 +91,7 @@ pipeline {
                     echo "Checking application..."
 
                     for i in $(seq 1 10); do
-                        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$DEPLOY_SERVER:8034 || echo "000")
+                        STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://$DEPLOY_SERVER:8034 || true)
 
                         echo "Attempt $i → HTTP $STATUS"
 
