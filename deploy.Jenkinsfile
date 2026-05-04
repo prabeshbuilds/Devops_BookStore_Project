@@ -6,7 +6,7 @@ pipeline {
         IMAGE_NAME    = "prabeshbuilds/bookstore-django"
         IMAGE_TAG     = "latest"
 
-        DEPLOY_SERVER = "172.31.37.153"
+        DEPLOY_SERVER = "52.71.255.95"
         DEPLOY_USER   = "ubuntu"
         DEPLOY_PORT   = "22"
 
