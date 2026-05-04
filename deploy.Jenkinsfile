@@ -63,7 +63,7 @@ pipeline {
 
                                 echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin
 
-                                docker pull prabeshbuilds/$APP_NAME:$IMAGE_TAG
+                                docker pull prabeshdevops/$APP_NAME:$IMAGE_TAG
 
                                 docker stop $APP_NAME || true
                                 docker rm $APP_NAME || true
@@ -73,7 +73,7 @@ pipeline {
                                     --restart unless-stopped \
                                     --env-file $ENV_FILE \
                                     -p $APP_PORT:8000 \
-                                    prabeshbuilds/$APP_NAME:$IMAGE_TAG
+                                    prabeshdevops/$APP_NAME:$IMAGE_TAG
 
                                 sleep 5
 
