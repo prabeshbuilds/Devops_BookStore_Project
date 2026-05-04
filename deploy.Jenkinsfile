@@ -47,33 +47,41 @@ pipeline {
 
         stage('🚀 Deploy on Server') {
             steps {
-                sshagent(['deployment-ssh']) {
-                    sh '''
-                        set -e
-
-                        ssh -o StrictHostKeyChecking=no -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_SERVER "
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-credentials',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sshagent(['deployment-ssh']) {
+                        sh '''
                             set -e
 
-                            echo '🚀 Deploying Bookstore App...'
-                            echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin
-                            docker pull prabeshbuilds/$APP_NAME:$IMAGE_TAG
+                            ssh -o StrictHostKeyChecking=no -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_SERVER "
+                                set -e
 
-                            docker stop $APP_NAME || true
-                            docker rm $APP_NAME || true
+                                echo '🚀 Deploying Bookstore App...'
 
-                            docker run -d \
-                                --name $APP_NAME \
-                                --restart unless-stopped \
-                                --env-file $ENV_FILE \
-                                -p $APP_PORT:8000 \
-                                prabeshbuilds/$APP_NAME:$IMAGE_TAG
+                                echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin
 
-                            sleep 5
+                                docker pull prabeshbuilds/$APP_NAME:$IMAGE_TAG
 
-                            docker ps | grep $APP_NAME || true
-                            docker logs --tail 20 $APP_NAME || true
-                        "
-                    '''
+                                docker stop $APP_NAME || true
+                                docker rm $APP_NAME || true
+
+                                docker run -d \
+                                    --name $APP_NAME \
+                                    --restart unless-stopped \
+                                    --env-file $ENV_FILE \
+                                    -p $APP_PORT:8000 \
+                                    prabeshbuilds/$APP_NAME:$IMAGE_TAG
+
+                                sleep 5
+
+                                docker ps | grep $APP_NAME || true
+                                docker logs --tail 20 $APP_NAME || true
+                            "
+                        '''
+                    }
                 }
             }
         }
