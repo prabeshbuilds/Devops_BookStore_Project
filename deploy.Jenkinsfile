@@ -1,10 +1,14 @@
 pipeline {
     agent any
 
+    triggers {
+    githubPush()
+    }
+
     environment {
         APP_NAME      = "bookstore-django"
-        IMAGE_NAME    = "prabeshbuilds/bookstore-django"
-        IMAGE_TAG     = "latest"
+        IMAGE_TAG     = "${env.GIT_COMMIT.take(7)}"
+        IMAGE_NAME = "prabeshdevops/bookstore-django"
 
         DEPLOY_SERVER = "52.71.255.95"
         DEPLOY_USER   = "ubuntu"
@@ -38,7 +42,7 @@ pipeline {
 
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-                        docker push $DOCKER_USERNAME/$APP_NAME:$IMAGE_TAG
+                        docker push $IMAGE_NAME:$IMAGE_TAG
                     '''
                 }
             }
@@ -62,7 +66,7 @@ pipeline {
 
                                 echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin
 
-                                docker pull prabeshdevops/$APP_NAME:$IMAGE_TAG
+                                docker pull $IMAGE_NAME:$IMAGE_TAG
 
                                 docker stop $APP_NAME || true
                                 docker rm $APP_NAME || true
@@ -72,7 +76,7 @@ pipeline {
                                     --restart unless-stopped \
                                     --env-file $ENV_FILE \
                                     -p $APP_PORT:8000 \
-                                    prabeshdevops/$APP_NAME:$IMAGE_TAG
+                                    $IMAGE_NAME:$IMAGE_TAG
 
                                 sleep 5
 
