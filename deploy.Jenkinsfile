@@ -10,7 +10,7 @@ pipeline {
         IMAGE_TAG     = "${env.GIT_COMMIT.take(7)}"
         IMAGE_NAME = "prabeshdevops/bookstore-django"
 
-        DEPLOY_SERVER = "52.71.255.95"
+        DEPLOY_SERVER = "13.221.202.181"
         DEPLOY_USER   = "ubuntu"
         DEPLOY_PORT   = "22"
 
